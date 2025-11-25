@@ -1,0 +1,30 @@
+services:
+  traefik:
+    image: traefik:v3.6.2
+    hostname: traefik
+    container_name: traefik
+    networks:
+      - service-network
+    environment:
+      - TZ=Asia/Seoul
+      - DOMAIN=${DOMAIN}
+      - CF_API_EMAIL=${CF_API_EMAIL}
+      - CF_DNS_API_TOKEN=${CF_DNS_API_TOKEN}
+    ports:
+      - "10080:80/tcp"
+      - "10443:443/tcp"
+      - "10444:443/udp"
+      - "10853:853/tcp"
+      - "10854:853/udp"
+   
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ${LOCAL_DIR}/traefik/traefik.yml:/etc/traefik/traefik.yml
+      - ${LOCAL_DIR}/traefik/dynamic.yml:/etc/traefik/dynamic.yml
+      - ${LOCAL_DIR}/traefik/tls:/etc/traefik/tls
+      - ${LOCAL_DIR}/traefik/log:/etc/traefik/logs
+
+networks:
+  service-network:
+    external:
+      name: service-network
