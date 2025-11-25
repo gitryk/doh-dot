@@ -1,0 +1,68 @@
+http:
+  serversTransports:
+    adguard-trans:
+      serverName: 'dns.{{ env "DOMAIN" }}'
+      insecureSkipVerify: true
+
+#Start Router
+  routers:
+    adguard:
+      entryPoints: [websecure]
+      rule: 'Host(`dns.{{ env "DOMAIN" }}`) && PathPrefix(`/dns-query`)'
+      service: adguard
+      priority: 1000
+      tls:
+        certResolver: cloudflare
+
+    adguard-dash:
+      entryPoints: [websecure]
+      rule: 'Host(`dns.{{ env "DOMAIN" }}`)'
+      service: adguard-dash
+      priority: 100
+      tls:
+        certResolver: cloudflare
+
+#Start Services
+  services:
+    adguard:
+      loadBalancer:
+        serversTransport: "adguard-trans"
+        servers:
+          - url: "https://adguard:443"
+
+    adguard-dash:
+      loadBalancer:
+        servers:
+          - url: "http://adguard:3000"
+
+#Start middlewares
+  middlewares:
+
+tcp:
+  routers:
+    dot-tcp:
+      entryPoints:
+        - "dot-tcp"
+      rule: "HostSNI(`dns.{{ env "DOMAIN" }}`)"
+      tls:
+        passthrough: true
+      service: dot-tcp
+
+  services:
+    dot-tcp:
+      loadBalancer:
+        servers:
+        - address: "adguard:853"
+
+udp:
+  routers:
+    dot-udp:
+      entryPoints:
+        - "dot-udp"
+      service: dot-udp
+
+  services:
+    dot-udp:
+      loadBalancer:
+        servers:
+          - address: "adguard:853"
