@@ -1,0 +1,75 @@
+global:
+  sendAnonymousUsage: false
+  checkNewVersion: true
+
+api:
+  dashboard: true
+  insecure: true
+  debug: true
+
+log:
+  level: "INFO" #Change required After setup: INFO or ERROR
+  filePath: "/etc/traefik/logs/log-file.log"
+
+accessLog:
+  format: json
+  filePath: "/etc/traefik/logs/access.log"
+  filters:
+    statusCodes:
+      - "200-299"
+      - "300-399"
+      - "400-599"
+    retryAttempts: true
+    minDuration: "10ms"
+
+entryPoints:
+  web:
+    address: ":80"
+    http:
+      redirections:
+        entryPoint:
+          to: websecure
+          scheme: https
+
+  websecure:
+    address: ":443"
+    http3:
+      advertisedPort: 443
+
+  dot-tcp:
+    address: ":853/tcp"
+
+  dot-udp:
+    address: ":853/udp"
+
+providers:
+  file:
+    watch: true
+    filename: "/etc/traefik/dynamic.yml"
+
+  docker:
+    endpoint: "unix:///var/run/docker.sock"
+    exposedByDefault: false
+    network: "service-network"
+    watch: true
+
+certificatesResolvers:
+  cloudflare:
+    acme:
+      email: me@domain.com
+      storage: /etc/traefik/tls/acme.json
+      caServer: https://acme-v02.api.letsencrypt.org/directory
+      dnschallenge:
+        provider: cloudflare
+        resolvers:
+          - "1.1.1.1:53"
+          - "1.0.0.1:53"
+        delayBeforeCheck: 5
+
+tls:
+  stores:
+    default:
+      defaultGeneratedCert:
+        domain:
+          main: "domain.com"
+          sans: "*.domain.com"
