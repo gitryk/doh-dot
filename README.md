@@ -30,6 +30,12 @@ I will update the configuration once I find a solution for this issue.
 
 &nbsp;
 
+## Links
+
+[https://github.com/ameshkov/dnslookup](https://github.com/ameshkov/dnslookup) - Useful Tool for Dns Query
+
+&nbsp;
+
 ## Exceptions
 
 The content of this document was written in English, translated using Gemini. 
