@@ -1,0 +1,17 @@
+services:
+  adguard:
+    image: adguard/adguardhome:latest
+    hostname: adguard
+    container_name: adguard
+    networks:
+      - service-network
+    environment:
+      - TZ=Asia/Seoul
+    volumes:
+      - ${LOCAL_DIR}/adguard/work:/opt/adguardhome/work
+      - ${LOCAL_DIR}/adguard/conf:/opt/adguardhome/conf
+      
+networks:
+  service-network:
+    external:
+      name: service-network
