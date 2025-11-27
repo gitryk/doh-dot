@@ -1,4 +1,4 @@
-# doh-dot
+# adguardhome-with-traefik
 
 Serve DoT+DoH DNS server with traefik+adguard home
 
